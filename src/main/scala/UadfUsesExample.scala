@@ -19,7 +19,6 @@
 
 import com.connected.uadf.ArraySumByIdUADF
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.types.{ArrayType, DoubleType}
 import org.apache.log4j.{Level, Logger}
 
 object UadfUsesExample
@@ -46,17 +45,15 @@ object UadfUsesExample
       (1, Array(13.2, 58.5, 23.34)),
       (2, Array(58.85, 23.73, 34.5)),
       (2, Array(135.145, 67.5456, 6.235))
-    ).toDF("id", "arrayCol")
+    ).toDF("id", "array_data")
 
 
-    val fun = new ArraySumByIdUADF()
-
-    df.select($"id", $"arrayCol" cast ArrayType(DoubleType))
-      .groupBy("id").agg(fun($"arrayCol"))
+    val uadfFunc = new ArraySumByIdUADF()
+    println("")
+    df.select($"id", $"array_data")
+      .groupBy("id")
+      .agg(uadfFunc($"array_data"))
       .show(false)
 
-    println("")
-    df.printSchema()
   }
-
 }

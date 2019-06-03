@@ -25,9 +25,8 @@ import org.apache.spark.sql.types._
 class ArraySumByIdUADF() extends UserDefinedAggregateFunction {
 
   def inputSchema: StructType = new StructType().add("arrayCol", ArrayType(DoubleType))
-    //StructType(Array(StructField("arrayCol", ArrayType(DoubleType))))
 
-  def bufferSchema = StructType(Array(StructField("sumArray", ArrayType(DoubleType))))
+  def bufferSchema = new StructType().add("sumArray", ArrayType(DoubleType))
 
   def dataType: DataType = ArrayType(DoubleType)
 
@@ -50,7 +49,7 @@ class ArraySumByIdUADF() extends UserDefinedAggregateFunction {
   }
 
   def evaluate(buffer: Row) = {
-    buffer.get(0)
+    buffer(0)
   }
 
 }
