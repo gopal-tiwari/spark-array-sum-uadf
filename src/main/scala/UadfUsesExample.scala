@@ -16,7 +16,47 @@
  *
  */
 
+
+import com.connected.uadf.ArraySumByIdUADF
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.{ArrayType, DoubleType}
+import org.apache.log4j.{Level, Logger}
+
 object UadfUsesExample
 {
+
+  def main(args: Array[String]): Unit =
+  {
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
+    Logger.getLogger("spark").setLevel(Level.OFF)
+    Logger.getLogger("hive").setLevel(Level.OFF)
+    Logger.getLogger("hadoop").setLevel(Level.OFF)
+    Logger.getLogger("hdfs").setLevel(Level.OFF)
+    Logger.getRootLogger().setLevel(Level.OFF)
+
+    val sc = SparkSession.builder
+      .appName("uadf example").master("local[2]")
+      .getOrCreate()
+
+    import sc.implicits._
+
+    val df = Seq(
+      (1, Array(22.2, 234.5, 69.5)),
+      (1, Array(13.2, 58.5, 23.34)),
+      (2, Array(58.85, 23.73, 34.5)),
+      (2, Array(135.145, 67.5456, 6.235))
+    ).toDF("id", "arrayCol")
+
+
+    val fun = new ArraySumByIdUADF()
+
+    df.select($"id", $"arrayCol" cast ArrayType(DoubleType))
+      .groupBy("id").agg(fun($"arrayCol"))
+      .show(false)
+
+    println("")
+    df.printSchema()
+  }
 
 }
