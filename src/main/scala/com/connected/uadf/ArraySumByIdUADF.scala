@@ -22,33 +22,43 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
 import org.apache.spark.sql.types._
 
-class ArraySumByIdUADF() extends UserDefinedAggregateFunction {
+/**
+  * Uadf to sum array elements based on position
+  */
+class ArraySumByIdUADF() extends UserDefinedAggregateFunction
+{
 
   def inputSchema: StructType = new StructType().add("arrayCol", ArrayType(DoubleType))
 
-  def bufferSchema = new StructType().add("sumArray", ArrayType(DoubleType))
+  def bufferSchema: StructType = new StructType().add("sumArray", ArrayType(DoubleType))
 
   def dataType: DataType = ArrayType(DoubleType)
 
   def deterministic = true
 
-  def initialize(buffer: MutableAggregationBuffer) = {
+  def initialize(buffer: MutableAggregationBuffer): Unit =
+  {
     buffer.update(0, Array(0.0, 0.0, 0.0))
   }
 
-  def update(buffer: MutableAggregationBuffer, input: Row) = {
+  def update(buffer: MutableAggregationBuffer, input: Row): Unit =
+  {
     val seqBuffer = buffer(0).asInstanceOf[IndexedSeq[Double]]
     val seqInput = input(0).asInstanceOf[IndexedSeq[Double]]
-    buffer(0) = seqBuffer.zip(seqInput).map{ case (x, y) => x + y }
+    buffer(0) = seqBuffer.zip(seqInput).map
+    { case (x, y) => x + y }
   }
 
-  def merge(buffer1: MutableAggregationBuffer, buffer2: Row) = {
+  def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit =
+  {
     val seqBuffer1 = buffer1(0).asInstanceOf[IndexedSeq[Double]]
     val seqBuffer2 = buffer2(0).asInstanceOf[IndexedSeq[Double]]
-    buffer1(0) = seqBuffer1.zip(seqBuffer2).map{ case (x, y) => x + y }
+    buffer1(0) = seqBuffer1.zip(seqBuffer2).map
+    { case (x, y) => x + y }
   }
 
-  def evaluate(buffer: Row) = {
+  def evaluate(buffer: Row): Any =
+  {
     buffer(0)
   }
 
