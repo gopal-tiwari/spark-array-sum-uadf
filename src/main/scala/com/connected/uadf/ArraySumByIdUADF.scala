@@ -23,7 +23,7 @@ import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAg
 import org.apache.spark.sql.types._
 
 /**
-  * Uadf to sum array elements based on position
+  * Uadf to sum array elements based on position by position.
   */
 class ArraySumByIdUADF() extends UserDefinedAggregateFunction
 {
